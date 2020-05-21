@@ -49,87 +49,89 @@ const GistPage: React.SFC<GistPageProps> = ({
   const userIsGistOwner = gist.owner && gist.owner.login === login;
   return (
     <div className="gist-page-container">
-      <div className="gist-page-action-panel">
-        {gist.owner && (
-          <div style={{ flexBasis: '50%' }}>
-            <GistInfo
-              avatarUrl={gist.owner.avatar_url}
-              userName={gist.owner.login}
-              gistName={Object.keys(gist.files)[0]}
-            />
-          </div>
-        )}
-        <div className="gist-page-actions">
-          {readOnly && userIsGistOwner && (
-            <IconButton
-              text="Edit"
-              icon={ICONS.EditIcon}
-              click={() => {
-                setReadOnly(false);
-              }}
-            />
+      {login && (
+        <div className="gist-page-action-panel">
+          {gist.owner && (
+            <div style={{ flexBasis: '50%' }}>
+              <GistInfo
+                avatarUrl={gist.owner.avatar_url}
+                userName={gist.owner.login}
+                gistName={Object.keys(gist.files)[0]}
+              />
+            </div>
           )}
-          {!readOnly && (
-            <IconButton
-              text="Save"
-              icon={ICONS.SaveIcon}
-              click={() => {
-                confirmDialog(CONFIRM_MESSAGES.UpdateGist).then(() => {
-                  updateGist(gist.id, {
-                    files: {
-                      [Object.keys(gist.files as Array<string>)[0]]: {
-                        content: updatedFileConent,
+          <div className="gist-page-actions">
+            {readOnly && userIsGistOwner && (
+              <IconButton
+                text="Edit"
+                icon={ICONS.EditIcon}
+                click={() => {
+                  setReadOnly(false);
+                }}
+              />
+            )}
+            {!readOnly && (
+              <IconButton
+                text="Save"
+                icon={ICONS.SaveIcon}
+                click={() => {
+                  confirmDialog(CONFIRM_MESSAGES.UpdateGist).then(() => {
+                    updateGist(gist.id, {
+                      files: {
+                        [Object.keys(gist.files as Array<string>)[0]]: {
+                          content: updatedFileConent,
+                        },
                       },
-                    },
-                  }).then(() => alertDialog(ALERT_MESSAGES.GistUpdated));
-                  setReadOnly(true);
-                });
-              }}
-            />
-          )}
+                    }).then(() => alertDialog(ALERT_MESSAGES.GistUpdated));
+                    setReadOnly(true);
+                  });
+                }}
+              />
+            )}
 
-          {userIsGistOwner && (
+            {userIsGistOwner && (
+              <IconButton
+                text="Delete"
+                icon={ICONS.DeleteIcon}
+                click={() => {
+                  confirmDialog(CONFIRM_MESSAGES.DeleteGist).then(() => {
+                    deleteGist(gist.id).then(() => {
+                      alertDialog(ALERT_MESSAGES.GistDeleted);
+                    });
+                  });
+                }}
+              />
+            )}
             <IconButton
-              text="Delete"
-              icon={ICONS.DeleteIcon}
+              text="Fork"
+              withCount
+              count={forksCount}
+              icon={ICONS.ForkIcon}
               click={() => {
-                confirmDialog(CONFIRM_MESSAGES.DeleteGist).then(() => {
-                  deleteGist(gist.id).then(() => {
-                    alertDialog(ALERT_MESSAGES.GistDeleted);
+                confirmDialog(CONFIRM_MESSAGES.ForkGist).then(() => {
+                  forkGist(gist.id).then(() => {
+                    alertDialog(ALERT_MESSAGES.GistForked);
+                    setForksCount(forksCount + 1);
                   });
                 });
               }}
             />
-          )}
-          <IconButton
-            text="Fork"
-            withCount
-            count={forksCount}
-            icon={ICONS.ForkIcon}
-            click={() => {
-              confirmDialog(CONFIRM_MESSAGES.ForkGist).then(() => {
-                forkGist(gist.id).then(() => {
-                  alertDialog(ALERT_MESSAGES.GistForked);
-                  setForksCount(forksCount + 1);
+            <IconButton
+              text="Star"
+              // withCount
+              // count={gist.forks && gist.forks.length}
+              icon={ICONS.StarIcon}
+              click={() => {
+                confirmDialog(CONFIRM_MESSAGES.StarGist).then(() => {
+                  starGist(gist.id).then(() => {
+                    alertDialog(ALERT_MESSAGES.GistStarred);
+                  });
                 });
-              });
-            }}
-          />
-          <IconButton
-            text="Star"
-            // withCount
-            // count={gist.forks && gist.forks.length}
-            icon={ICONS.StarIcon}
-            click={() => {
-              confirmDialog(CONFIRM_MESSAGES.StarGist).then(() => {
-                starGist(gist.id).then(() => {
-                  alertDialog(ALERT_MESSAGES.GistStarred);
-                });
-              });
-            }}
-          />
+              }}
+            />
+          </div>
         </div>
-      </div>
+      )}
       {gist.files && (
         <GistFile
           showFileName
