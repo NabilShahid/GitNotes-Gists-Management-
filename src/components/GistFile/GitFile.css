@@ -1,8 +1,9 @@
 .gist-file-container {
   height: 540px;
-  width: 100%;
+  width: 99%;
   /* margin-bottom: 170px; */
   overflow: hidden;
+  margin: 7px;
 }
 
 .code-mirror-custom {

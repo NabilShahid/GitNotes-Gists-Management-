@@ -132,6 +132,11 @@ const GistPage: React.SFC<GistPageProps> = ({
           </div>
         </div>
       )}
+      {!login && (
+        <div className="gist-page-action-panel">
+          Please login to take actions on this gist
+        </div>
+      )}
       {gist.files && (
         <GistFile
           showFileName
